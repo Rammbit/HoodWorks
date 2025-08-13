@@ -1,15 +1,33 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 
 const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const handleSignup = () => {
-    // TODO: Implement signup logic
-    console.log('Signing up with:', name, email, password);
-    navigation.navigate('Home');
+  const handleSignup = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/users/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Signup Successful', 'You can now log in.');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Signup Failed', data.message || 'Something went wrong.');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Signup Failed', 'An unexpected error occurred. Please try again.');
+    }
   };
 
   return (
